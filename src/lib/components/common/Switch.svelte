@@ -40,7 +40,21 @@
 		}}
 	>
 		<Switch.Thumb
-			class="pointer-events-none block size-3 shrink-0 rounded-full bg-white transition-transform data-[state=checked]:translate-x-3 data-[state=unchecked]:translate-x-0 data-[state=unchecked]:shadow-mini "
+			class="switch-thumb pointer-events-none block size-3 shrink-0 rounded-full bg-white transition-transform data-[state=unchecked]:shadow-mini"
 		/>
 	</Switch.Root>
 </Tooltip>
+
+<style>
+	.switch-thumb {
+		transform: translateX(0);
+	}
+
+	:global(html[dir='ltr']) .switch-thumb[data-state='checked'] {
+		transform: translateX(0.75rem);
+	}
+
+	:global(html[dir='rtl']) .switch-thumb[data-state='checked'] {
+		transform: translateX(-0.75rem);
+	}
+</style>
