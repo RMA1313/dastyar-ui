@@ -295,6 +295,19 @@
 	let htmlValue = '';
 	let jsonValue = '';
 	let mdValue = '';
+	let editorDirection: 'auto' | 'ltr' | 'rtl' = 'auto';
+
+	const detectDirection = (text: string) => {
+		const strongChar = (text ?? '').match(
+			/[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFA-Za-z]/
+		)?.[0];
+
+		if (!strongChar) {
+			return 'auto';
+		}
+
+		return /[A-Za-z]/.test(strongChar) ? 'ltr' : 'rtl';
+	};
 
 	let provider: SocketIOCollaborationProvider | null = null;
 
@@ -1262,6 +1275,8 @@
 		onValueChange();
 	}
 
+	$: editorDirection = messageInput ? detectDirection(value ?? '') : 'auto';
+
 	const onValueChange = () => {
 		if (!editor) return;
 
@@ -1333,6 +1348,29 @@
 
 <div
 	bind:this={element}
-	dir="auto"
+	dir={messageInput ? editorDirection : 'auto'}
+	class:chat-message-input={messageInput}
 	class="relative w-full min-w-full {className} {!editable ? 'cursor-not-allowed' : ''}"
 />
+
+<style>
+	.chat-message-input :global(.ProseMirror) {
+		text-align: start;
+	}
+
+	.chat-message-input :global(.ProseMirror p),
+	.chat-message-input :global(.ProseMirror div),
+	.chat-message-input :global(.ProseMirror li) {
+		direction: inherit;
+		unicode-bidi: plaintext;
+		text-align: start;
+	}
+
+	.chat-message-input :global(.ProseMirror) {
+		unicode-bidi: plaintext;
+	}
+
+	.chat-message-input :global(.ProseMirror p.is-editor-empty:first-child::before) {
+		float: inline-start;
+	}
+</style>
