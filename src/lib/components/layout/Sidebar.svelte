@@ -498,7 +498,9 @@
 	};
 
 	const resizeSidebarHandler = (endClientX) => {
-		const dx = endClientX - startClientX;
+		// In RTL, the sidebar edge is mirrored, so dragging must be interpreted
+		// from the opposite horizontal direction to keep resizing intuitive.
+		const dx = isRtl ? startClientX - endClientX : endClientX - startClientX;
 		const newSidebarWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + dx));
 
 		sidebarWidth.set(newSidebarWidth);

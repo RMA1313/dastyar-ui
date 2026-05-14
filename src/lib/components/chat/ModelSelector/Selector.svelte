@@ -79,10 +79,24 @@
 	const updatePosition = () => {
 		if (!show || !triggerElement) return;
 		const rect = triggerElement.getBoundingClientRect();
+		const margin = 8;
+		const maxWidth = window.innerWidth - margin * 2;
+
+		let width = $mobile ? window.innerWidth - 16 : rect.width;
+
+		if (width > maxWidth) width = maxWidth;
+
+		let left = rect.left;
+
+		if (left + width + margin > window.innerWidth) {
+			left = window.innerWidth - width - margin;
+		}
+		if (left < margin) left = margin;
+
 		dropdownPosition = {
 			top: rect.bottom + 2,
-			left: $mobile ? 8 : rect.left,
-			width: $mobile ? window.innerWidth - 16 : 0
+			left,
+			width
 		};
 	};
 
@@ -544,9 +558,7 @@
 		<div
 			use:portal
 			bind:this={contentElement}
-			style="position: fixed; z-index: 9999; top: {dropdownPosition.top}px; left: {dropdownPosition.left}px;{$mobile
-				? ` width: ${dropdownPosition.width}px;`
-				: ''}"
+			style="position: fixed; z-index: 9999; top: {dropdownPosition.top}px; left: {dropdownPosition.left}px; width: {dropdownPosition.width}px;"
 		>
 			<div
 				class="z-40 {$mobile
@@ -731,7 +743,7 @@
 									listScrollTop = listContainer.scrollTop;
 								}}
 							>
-								<div style="height: {visibleStart * ITEM_HEIGHT}px;" />
+								<div style="height: {visibleStart * ITEM_HEIGHT}px;"></div>
 								{#each filteredItems.slice(visibleStart, visibleEnd) as item, i (item.value)}
 									{@const index = visibleStart + i}
 									<ModelItem
@@ -750,7 +762,7 @@
 										}}
 									/>
 								{/each}
-								<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;" />
+								<div style="height: {(filteredItems.length - visibleEnd) * ITEM_HEIGHT}px;"></div>
 							</div>
 						{/if}
 
@@ -841,8 +853,8 @@
 
 					<div class="pb-2.5"></div>
 
-					<div class="hidden w-[42rem]" />
-					<div class="hidden w-[32rem]" />
+					<div class="hidden w-[42rem]"></div>
+					<div class="hidden w-[32rem]"></div>
 				</slot>
 			</div>
 		</div>
