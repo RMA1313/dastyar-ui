@@ -1004,7 +1004,9 @@ import { APP_NAME, WEBUI_API_BASE_URL, WEBUI_BASE_URL, WEBUI_HOSTNAME } from '$l
 		// Initialize i18n even if we didn't get a backend config,
 		// so `/error` can show something that's not `undefined`.
 
-		initI18n(localStorage?.locale);
+		const DEFAULT_LOCALE = 'fa-IR';
+
+		initI18n(localStorage?.locale ?? DEFAULT_LOCALE);
 		if (!localStorage.locale) {
 			const languages = await getLanguages();
 			const browserLanguages = navigator.languages
@@ -1012,7 +1014,8 @@ import { APP_NAME, WEBUI_API_BASE_URL, WEBUI_BASE_URL, WEBUI_HOSTNAME } from '$l
 				: [navigator.language || navigator.userLanguage];
 			const lang = backendConfig?.default_locale
 				? backendConfig.default_locale
-				: bestMatchingLanguage(languages, browserLanguages, 'en-US');
+				: bestMatchingLanguage(languages, browserLanguages, DEFAULT_LOCALE);
+			localStorage.locale = lang;
 			changeLanguage(lang);
 			dayjs.locale(lang);
 		}
