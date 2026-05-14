@@ -28,12 +28,15 @@
 	let showValves = getOpen('valves', false);
 	let showSystemPrompt = getOpen('systemPrompt');
 	let showAdvancedParams = getOpen('advancedParams');
+	let isRtl = false;
+
+	$: isRtl = /^fa\b|^ar\b|^ur\b/i.test($i18n?.language ?? '');
 </script>
 
-<div class=" dark:text-white">
+<div class:rtl-panel={isRtl} class="dark:text-white">
 	{#if !embed}
-		<div class=" flex items-center justify-between dark:text-gray-100 mb-2">
-			<div class=" text-md self-center font-primary">{$i18n.t('Controls')}</div>
+		<div class:rtl-header={isRtl} class="flex items-center justify-between dark:text-gray-100 mb-2">
+			<div class="text-md self-center font-primary">{$i18n.t('Controls')}</div>
 			<button
 				class="self-center"
 				aria-label={$i18n.t('Close chat controls')}
@@ -109,7 +112,8 @@
 					<div class="" slot="content">
 						<textarea
 							bind:value={params.system}
-							class="w-full text-xs outline-hidden resize-vertical {$settings.highContrastMode
+							dir={isRtl ? 'rtl' : 'auto'}
+							class="chat-controls-textarea w-full text-xs outline-hidden resize-vertical {$settings.highContrastMode
 								? 'border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 p-2.5'
 								: 'py-1.5 bg-transparent'}"
 							rows="4"
@@ -138,3 +142,22 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.rtl-panel {
+		direction: rtl;
+	}
+
+	.rtl-header {
+		flex-direction: row-reverse;
+	}
+
+	.rtl-panel :global(textarea.chat-controls-textarea) {
+		text-align: right;
+	}
+
+	.rtl-panel :global([dir='ltr']) {
+		direction: ltr;
+		unicode-bidi: plaintext;
+	}
+</style>

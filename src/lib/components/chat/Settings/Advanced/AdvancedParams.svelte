@@ -438,7 +438,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'logit_bias'}
+					<span dir="ltr">logit_bias</span>
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition shrink-0 outline-hidden"
@@ -483,7 +483,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'max_tokens'}
+					<span dir="ltr">max_tokens</span>
 				</div>
 
 				<button
@@ -538,7 +538,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'top_k'}
+					<span dir="ltr">top_k</span>
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition shrink-0 outline-hidden"
@@ -593,7 +593,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'top_p'}
+					<span dir="ltr">top_p</span>
 				</div>
 
 				<button
@@ -649,7 +649,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'min_p'}
+					<span dir="ltr">min_p</span>
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition shrink-0 outline-hidden"
@@ -704,7 +704,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'frequency_penalty'}
+					<span dir="ltr">frequency_penalty</span>
 				</div>
 
 				<button
@@ -760,7 +760,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'presence_penalty'}
+					<span dir="ltr">presence_penalty</span>
 				</div>
 
 				<button
@@ -814,7 +814,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'mirostat'}
+					<span dir="ltr">mirostat</span>
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition shrink-0 outline-hidden"
@@ -869,7 +869,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'mirostat_eta'}
+					<span dir="ltr">mirostat_eta</span>
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition shrink-0 outline-hidden"
@@ -924,7 +924,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'mirostat_tau'}
+					<span dir="ltr">mirostat_tau</span>
 				</div>
 
 				<button
@@ -978,7 +978,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'repeat_last_n'}
+					<span dir="ltr">repeat_last_n</span>
 				</div>
 
 				<button
@@ -1034,7 +1034,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'tfs_z'}
+					<span dir="ltr">tfs_z</span>
 				</div>
 
 				<button
@@ -1090,7 +1090,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs">
-					{'repeat_penalty'}
+					<span dir="ltr">repeat_penalty</span>
 				</div>
 
 				<button
