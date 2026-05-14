@@ -1348,14 +1348,16 @@
 
 <div
 	bind:this={element}
-	dir={messageInput ? editorDirection : 'auto'}
+	// Keep the message composer rooted in RTL so the empty placeholder starts on the right.
+	dir={messageInput ? 'rtl' : 'auto'}
 	class:chat-message-input={messageInput}
 	class="relative w-full min-w-full {className} {!editable ? 'cursor-not-allowed' : ''}"
 />
 
 <style>
 	.chat-message-input :global(.ProseMirror) {
-		text-align: start;
+		/* Keep the chat composer caret and placeholder anchored to the right in RTL. */
+		text-align: right;
 	}
 
 	.chat-message-input :global(.ProseMirror p),
@@ -1371,6 +1373,7 @@
 	}
 
 	.chat-message-input :global(.ProseMirror p.is-editor-empty:first-child::before) {
-		float: inline-start;
+		float: inline-end;
+		text-align: right;
 	}
 </style>
