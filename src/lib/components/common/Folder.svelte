@@ -2,6 +2,8 @@
 	import { getContext, createEventDispatcher, onMount, onDestroy } from 'svelte';
 
 	const i18n = getContext('i18n');
+	$: activeLocale = $i18n?.language ?? '';
+	$: isRtl = /^fa(?:[-_].*)?$/i.test(activeLocale);
 	const dispatch = createEventDispatcher();
 
 	import ChevronDown from '../icons/ChevronDown.svelte';
@@ -150,15 +152,19 @@
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					id="sidebar-folder-button"
-					class=" w-full group rounded-xl relative flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-900 transition {buttonClassName}"
+					class="w-full group rounded-xl relative flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-900 transition {buttonClassName}"
 				>
-					<button class="w-full py-1.5 pl-2 flex items-center gap-1.5 text-xs font-medium">
+					<button
+						class="w-full py-1.5 px-2 flex items-center gap-1.5 text-xs font-medium {isRtl
+							? 'flex-row-reverse text-right'
+							: ''}"
+					>
 						{#if chevron}
-							<div class=" p-[1px]">
+							<div class="p-[1px]">
 								{#if open}
-									<ChevronDown className=" size-3" strokeWidth="2" />
+									<ChevronDown className="size-3" strokeWidth="2" />
 								{:else}
-									<ChevronRight className=" size-3" strokeWidth="2" />
+									<ChevronRight className="size-3" strokeWidth="2" />
 								{/if}
 							</div>
 						{/if}
@@ -170,7 +176,7 @@
 
 					{#if onAdd}
 						<button
-							class="absolute z-10 right-2 invisible group-hover:visible self-center flex items-center dark:text-gray-300"
+							class="absolute z-10 {isRtl ? 'left-2' : 'right-2'} invisible group-hover:visible self-center flex items-center dark:text-gray-300"
 							on:pointerup={(e) => {
 								e.stopPropagation();
 							}}
@@ -184,7 +190,7 @@
 									class="p-0.5 dark:hover:bg-gray-850 rounded-lg touch-auto"
 									on:click={(e) => {}}
 								>
-									<Plus className=" size-3" strokeWidth="2.5" />
+									<Plus className="size-3" strokeWidth="2.5" />
 								</button>
 							</Tooltip>
 						</button>

@@ -34,6 +34,8 @@
 	import { onMount, getContext, tick, onDestroy } from 'svelte';
 
 	const i18n = getContext('i18n');
+	$: activeLocale = $i18n?.language ?? '';
+	$: isRtl = /^fa(?:[-_].*)?$/i.test(activeLocale);
 
 	import {
 		getChatList,
@@ -986,6 +988,7 @@
 	<div
 		bind:this={navElement}
 		id="sidebar"
+		dir={isRtl ? 'rtl' : 'ltr'}
 		class="h-screen max-h-[100dvh] min-h-screen select-none {$showSidebar
 			? `${$mobile ? 'bg-gray-50 dark:bg-gray-950' : 'bg-gray-50/70 dark:bg-gray-950/70'} z-50`
 			: ' bg-transparent z-0 '} {$isApp
@@ -1001,7 +1004,9 @@
 				: 'invisible'}"
 		>
 			<div
-				class="sidebar px-[0.5625rem] pt-2 pb-1.5 flex justify-between space-x-1 text-gray-600 dark:text-gray-400 sticky top-0 z-10 -mb-3"
+				class="sidebar px-[0.5625rem] pt-2 pb-1.5 flex justify-between space-x-1 text-gray-600 dark:text-gray-400 sticky top-0 z-10 -mb-3 {isRtl
+					? 'flex-row-reverse space-x-reverse'
+					: ''}"
 			>
 				<a
 					class="flex items-center rounded-xl size-8.5 h-full justify-center hover:bg-gray-100/50 dark:hover:bg-gray-850/50 transition no-drag-region"
@@ -1020,7 +1025,9 @@
 				<a href="/" class="flex flex-1 px-0.5" on:click={newChatHandler}>
 					<div
 						id="sidebar-webui-name"
-						class=" self-center font-medium text-gray-850 dark:text-white font-primary"
+						class=" self-center font-medium text-gray-850 dark:text-white font-primary {isRtl
+							? 'text-right w-full'
+							: ''}"
 					>
 						{$WEBUI_NAME}
 					</div>
@@ -1065,42 +1072,55 @@
 					<div class="px-[0.4375rem] flex justify-center text-gray-800 dark:text-gray-200">
 						<a
 							id="sidebar-new-chat-button"
-							class="group grow flex items-center space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition outline-none"
+							class="group grow flex items-center justify-between gap-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition outline-none"
 							href="/"
 							draggable="false"
 							on:click={newChatHandler}
 							aria-label={$i18n.t('New Chat')}
 						>
-							<div class="self-center">
-								<PencilSquare className=" size-4.5" strokeWidth="2" />
+							<div class="flex min-w-0 items-center gap-3 {isRtl ? 'justify-end text-right' : 'flex-1'}">
+								<div class="flex w-5 shrink-0 justify-center self-center">
+									<PencilSquare className=" size-4.5" strokeWidth="2" />
+								</div>
+
+								<div class="flex min-w-0 self-center translate-y-[0.5px] {isRtl ? '' : 'flex-1'}">
+									<div class="self-center w-full text-sm font-primary {isRtl ? 'text-right' : ''}">
+										{$i18n.t('New Chat')}
+									</div>
+								</div>
 							</div>
 
-							<div class="flex flex-1 self-center translate-y-[0.5px]">
-								<div class=" self-center text-sm font-primary">{$i18n.t('New Chat')}</div>
+							<div class="shrink-0 self-center" dir="ltr">
+								<HotkeyHint name="newChat" className="group-hover:visible invisible" />
 							</div>
-
-							<HotkeyHint name="newChat" className=" group-hover:visible invisible" />
 						</a>
 					</div>
 
 					<div class="px-[0.4375rem] flex justify-center text-gray-800 dark:text-gray-200">
 						<button
 							id="sidebar-search-button"
-							class="group grow flex items-center space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition outline-none"
+							class="group grow flex items-center justify-between gap-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition outline-none"
 							on:click={() => {
 								showSearch.set(true);
 							}}
 							draggable="false"
 							aria-label={$i18n.t('Search')}
 						>
-							<div class="self-center">
-								<Search strokeWidth="2" className="size-4.5" />
+							<div class="flex min-w-0 items-center gap-3 {isRtl ? 'justify-end text-right' : 'flex-1'}">
+								<div class="flex w-5 shrink-0 justify-center self-center">
+									<Search strokeWidth="2" className="size-4.5" />
+								</div>
+
+								<div class="flex min-w-0 self-center translate-y-[0.5px] {isRtl ? '' : 'flex-1'}">
+									<div class="self-center w-full text-sm font-primary {isRtl ? 'text-right' : ''}">
+										{$i18n.t('Search')}
+									</div>
+								</div>
 							</div>
 
-							<div class="flex flex-1 self-center translate-y-[0.5px]">
-								<div class=" self-center text-sm font-primary">{$i18n.t('Search')}</div>
+							<div class="shrink-0 self-center" dir="ltr">
+								<HotkeyHint name="search" className="group-hover:visible invisible" />
 							</div>
-							<HotkeyHint name="search" className=" group-hover:visible invisible" />
 						</button>
 					</div>
 
@@ -1114,67 +1134,71 @@
 								>
 									<a
 										id="sidebar-{itemId}-button"
-										class="grow flex items-center space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+										class="grow flex items-center justify-between gap-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition"
 										href={meta.href}
 										on:click={itemClickHandler}
 										draggable="false"
 										aria-label={$i18n.t(meta.label)}
 									>
-										<div class="self-center">
-											{#if itemId === 'notes'}
-												<Note className="size-4.5" strokeWidth="2" />
-											{:else if itemId === 'workspace'}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke-width="2"
-													stroke="currentColor"
-													class="size-4.5"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
-													/>
-												</svg>
-											{:else if itemId === 'automations'}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke-width="2"
-													stroke="currentColor"
-													class="size-4.5"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-													/>
-												</svg>
-											{:else if itemId === 'calendar'}
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													stroke-width="2"
-													stroke="currentColor"
-													class="size-4.5"
-												>
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-													/>
-												</svg>
-											{:else if itemId === 'playground'}
-												<Code className="size-4.5" strokeWidth="2" />
-											{/if}
-										</div>
+										<div class="flex min-w-0 items-center gap-3 {isRtl ? 'justify-end text-right' : 'flex-1'}">
+											<div class="flex w-5 shrink-0 justify-center self-center">
+												{#if itemId === 'notes'}
+													<Note className="size-4.5" strokeWidth="2" />
+												{:else if itemId === 'workspace'}
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke-width="2"
+														stroke="currentColor"
+														class="size-4.5"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 0 0 2.25-2.25V6a2.25 2.25 0 0 0-2.25-2.25H6A2.25 2.25 0 0 0 3.75 6v2.25A2.25 2.25 0 0 0 6 10.5Zm0 9.75h2.25A2.25 2.25 0 0 0 10.5 18v-2.25a2.25 2.25 0 0 0-2.25-2.25H6a2.25 2.25 0 0 0-2.25 2.25V18A2.25 2.25 0 0 0 6 20.25Zm9.75-9.75H18a2.25 2.25 0 0 0 2.25-2.25V6A2.25 2.25 0 0 0 18 3.75h-2.25A2.25 2.25 0 0 0 13.5 6v2.25a2.25 2.25 0 0 0 2.25 2.25Z"
+														/>
+													</svg>
+												{:else if itemId === 'automations'}
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke-width="2"
+														stroke="currentColor"
+														class="size-4.5"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+														/>
+													</svg>
+												{:else if itemId === 'calendar'}
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke-width="2"
+														stroke="currentColor"
+														class="size-4.5"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+														/>
+													</svg>
+												{:else if itemId === 'playground'}
+													<Code className="size-4.5" strokeWidth="2" />
+												{/if}
+											</div>
 
-										<div class="flex self-center translate-y-[0.5px]">
-											<div class=" self-center text-sm font-primary">{$i18n.t(meta.label)}</div>
+											<div class="flex min-w-0 self-center translate-y-[0.5px] {isRtl ? '' : 'flex-1'}">
+												<div class="self-center w-full text-sm font-primary {isRtl ? 'text-right' : ''}">
+													{$i18n.t(meta.label)}
+												</div>
+											</div>
 										</div>
 									</a>
 								</div>
@@ -1300,6 +1324,7 @@
 						id="sidebar-folders"
 						bind:open={showFolders}
 						className="px-2 mt-0.5"
+						buttonClassName={isRtl ? 'text-right' : ''}
 						name={$i18n.t('Folders')}
 						chevron={false}
 						onAdd={() => {
@@ -1352,6 +1377,7 @@
 				<Folder
 					id="sidebar-chats"
 					className="px-2 mt-0.5"
+					buttonClassName={isRtl ? 'text-right' : ''}
 					name={$i18n.t('Chats')}
 					chevron={false}
 					on:change={async (e) => {
@@ -1509,7 +1535,9 @@
 								{#each $chats as chat, idx (`chat-${chat?.id ?? idx}`)}
 									{#if idx === 0 || (idx > 0 && chat.time_range !== $chats[idx - 1].time_range)}
 										<div
-											class="w-full pl-2.5 text-xs text-gray-500 dark:text-gray-500 font-medium {idx ===
+										class="w-full pl-2.5 text-xs text-gray-500 dark:text-gray-500 font-medium {isRtl
+											? 'text-right pr-2.5 pl-0'
+											: ''} {idx ===
 											0
 												? ''
 												: 'pt-5'} pb-1.5"
@@ -1608,9 +1636,11 @@
 							}}
 						>
 							<div
-								class=" flex items-center rounded-2xl py-2 px-1.5 w-full hover:bg-gray-100/50 dark:hover:bg-gray-900/50 transition"
+								class=" flex items-center rounded-2xl py-2 px-1.5 w-full hover:bg-gray-100/50 dark:hover:bg-gray-900/50 transition {isRtl
+									? 'flex-row-reverse text-right'
+									: ''}"
 							>
-								<div class=" self-center mr-3 relative">
+								<div class=" self-center mr-3 relative {isRtl ? 'mr-0 ml-3' : ''}">
 									<img
 										src={`${WEBUI_API_BASE_URL}/users/${$user?.id}/profile/image`}
 										class=" size-7 object-cover rounded-full"
@@ -1630,7 +1660,9 @@
 										</div>
 									{/if}
 								</div>
-								<div class=" self-center font-medium">{$user?.name}</div>
+								<div class=" self-center font-medium {isRtl ? 'text-right flex-1' : ''}">
+									{$user?.name}
+								</div>
 							</div>
 						</UserMenu>
 					{/if}
