@@ -40,6 +40,19 @@ const createIsLoadingStore = (i18n: i18nType) => {
 	return isLoading;
 };
 
+const normalizeLanguage = (lang?: string) => {
+	if (!lang) return lang;
+
+	const normalized = lang.replace(/_/g, '-');
+	const lower = normalized.toLowerCase();
+
+	if (lower === 'fa' || lower.startsWith('fa-')) {
+		return 'fa-IR';
+	}
+
+	return normalized;
+};
+
 export const initI18n = (defaultLocale?: string | undefined) => {
 	const detectionOrder = defaultLocale
 		? ['querystring', 'localStorage']
@@ -47,7 +60,7 @@ export const initI18n = (defaultLocale?: string | undefined) => {
 	const fallbackDefaultLocale = defaultLocale ? [defaultLocale] : ['en-US'];
 
 	const loadResource = (language: string, namespace: string) =>
-		import(`./locales/${language}/${namespace}.json`);
+		import(`./locales/${normalizeLanguage(language)}/${namespace}.json`);
 
 	i18next
 		.use(resourcesToBackend(loadResource))
@@ -80,8 +93,9 @@ export const getLanguages = async () => {
 	return languages;
 };
 export const changeLanguage = (lang: string) => {
-	document.documentElement.setAttribute('lang', lang);
-	i18next.changeLanguage(lang);
+	const normalizedLang = normalizeLanguage(lang);
+	document.documentElement.setAttribute('lang', normalizedLang ?? lang);
+	i18next.changeLanguage(normalizedLang ?? lang);
 };
 
 export default i18n;
