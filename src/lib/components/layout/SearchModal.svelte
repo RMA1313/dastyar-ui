@@ -23,6 +23,9 @@
 
 	export let show = false;
 	export let onClose = () => {};
+	let isRtl = false;
+
+	$: isRtl = /^fa(?:[-_].*)?$/i.test($i18n?.language ?? '');
 
 	let actions = [
 		{
@@ -257,9 +260,10 @@
 </script>
 
 <Modal size="xl" bind:show>
-	<div class="py-3 dark:text-gray-300 text-gray-700">
+	<div class:rtl-search-modal={isRtl} class="py-3 dark:text-gray-300 text-gray-700">
 		<div class="px-4 pb-1.5">
 			<SearchInput
+				isRtl={isRtl}
 				bind:value={query}
 				on:input={searchHandler}
 				placeholder={$i18n.t('Search')}
@@ -295,20 +299,21 @@
 
 		<!-- <hr class="border-gray-50 dark:border-gray-850/30 my-1" /> -->
 
-		<div class="flex px-4 pb-1">
+		<div class:rtl-search-columns={isRtl} class="flex px-4 pb-1">
 			<div
+				class:rtl-search-panel={isRtl}
 				class="flex flex-col overflow-y-auto h-96 md:h-[40rem] max-h-full scrollbar-hidden w-full flex-1 pr-2"
 			>
-				<div class="w-full text-xs text-gray-500 dark:text-gray-500 font-medium pb-2 px-2">
+				<div class:rtl-options-head={isRtl} class="w-full text-xs text-gray-500 dark:text-gray-500 font-medium pb-2 px-2">
 					{$i18n.t('Actions')}
 				</div>
 
-				{#each actions as action, idx (action.label)}
-					<button
-						class=" w-full flex items-center rounded-xl text-sm py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-850 {selectedIdx ===
-						idx
-							? 'bg-gray-50 dark:bg-gray-850'
-							: ''}"
+					{#each actions as action, idx (action.label)}
+						<button
+							class="w-full flex items-center rounded-xl text-sm py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-850 {selectedIdx ===
+							idx
+								? 'bg-gray-50 dark:bg-gray-850'
+								: ''}"
 						data-arrow-selected={selectedIdx === idx ? 'true' : undefined}
 						dragabble="false"
 						on:mouseenter={() => {
@@ -321,7 +326,7 @@
 						<div class="pr-2">
 							<svelte:component this={action.icon} />
 						</div>
-						<div class=" flex-1 text-left">
+						<div class:rtl-action-label={isRtl} class="action-label flex-1 text-left">
 							<div class="text-ellipsis line-clamp-1 w-full">
 								{$i18n.t(action.label)}
 							</div>
@@ -333,7 +338,7 @@
 					<hr class="border-gray-50 dark:border-gray-850/30 my-3" />
 
 					{#if chatList.length === 0}
-						<div class="text-xs text-gray-500 dark:text-gray-400 text-center px-5 py-4">
+						<div class:rtl-empty-options={isRtl} class="text-xs text-gray-500 dark:text-gray-400 text-center px-5 py-4">
 							{$i18n.t('No results found')}
 						</div>
 					{/if}
@@ -368,7 +373,8 @@
 						{/if}
 
 						<a
-							class=" w-full flex justify-between items-center rounded-xl text-sm py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-850 {selectedIdx ===
+							class:rtl-result-row={isRtl}
+							class="w-full flex justify-between items-center rounded-xl text-sm py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-850 {selectedIdx ===
 							idx + actions.length
 								? 'bg-gray-50 dark:bg-gray-850'
 								: ''}"
@@ -384,13 +390,13 @@
 								onClose();
 							}}
 						>
-							<div class=" flex-1">
+							<div class="flex-1">
 								<div class="text-ellipsis line-clamp-1 w-full">
 									{chat?.title}
 								</div>
 							</div>
 
-							<div class=" pl-3 shrink-0 text-gray-500 dark:text-gray-400 text-xs">
+							<div class:rtl-chat-date={isRtl} class="chat-date pl-3 shrink-0 text-gray-500 dark:text-gray-400 text-xs">
 								{$i18n.t(
 									dayjs(chat?.updated_at * 1000).calendar(null, {
 										sameDay: '[Today]',
@@ -427,10 +433,12 @@
 			</div>
 			<div
 				id="chat-preview"
+				class:rtl-search-preview={isRtl}
 				class="hidden md:flex md:flex-1 w-full overflow-y-auto h-96 md:h-[40rem] scrollbar-hidden @container"
 			>
 				{#if messages === null}
 					<div
+						class:rtl-empty-preview={isRtl}
 						class="w-full h-full flex justify-center items-center text-gray-500 dark:text-gray-400 text-sm"
 					>
 						{$i18n.t('Select a conversation to preview')}
@@ -456,3 +464,32 @@
 		</div>
 	</div>
 </Modal>
+
+<style>
+	.rtl-search-columns {
+		flex-direction: row-reverse;
+	}
+
+	.rtl-search-panel {
+		text-align: right;
+	}
+
+	.rtl-result-row {
+		flex-direction: row-reverse;
+	}
+
+	.rtl-action-label {
+		text-align: right;
+	}
+
+	.rtl-chat-date {
+		padding-left: 0;
+		padding-right: 0.75rem;
+		text-align: right;
+	}
+
+	.rtl-search-preview,
+	.rtl-empty-preview {
+		text-align: right;
+	}
+</style>

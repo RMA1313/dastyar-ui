@@ -12,6 +12,7 @@
 	export let placeholder = '';
 	export let value = '';
 	export let showClearButton = false;
+	export let isRtl = false;
 
 	export let onFocus = () => {};
 	export let onKeydown = (e) => {};
@@ -198,15 +199,16 @@
 	};
 </script>
 
-<div class="px-1 mb-1 flex justify-center space-x-2 relative z-10" id="search-container">
-	<div class="flex w-full rounded-xl" id="chat-search">
-		<div class="self-center py-2 rounded-l-xl bg-transparent dark:text-gray-300">
+<div class:rtl-search-input={isRtl} class="px-1 mb-1 flex justify-center space-x-2 relative z-10" id="search-container">
+	<div class:rtl-search-shell={isRtl} class="flex w-full rounded-xl" id="chat-search">
+		<div class:rtl-search-icon={isRtl} class="self-center py-2 rounded-l-xl bg-transparent dark:text-gray-300">
 			<Search />
 		</div>
 
 		<input
 			id="search-input"
-			class="w-full rounded-r-xl py-1.5 pl-2.5 text-sm bg-transparent dark:text-gray-300 outline-hidden"
+			dir={isRtl && !value ? 'rtl' : 'auto'}
+			class="search-input w-full rounded-r-xl py-1.5 pl-2.5 text-sm bg-transparent dark:text-gray-300 outline-hidden"
 			placeholder={placeholder ? placeholder : $i18n.t('Search')}
 			autocomplete="off"
 			maxlength="500"
@@ -299,6 +301,7 @@
 	{#if focused && (filteredOptions.length > 0 || filteredItems.length > 0)}
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
+			class:rtl-search-options={isRtl}
 			class="absolute top-0 mt-8 left-0 right-1 border border-gray-100 dark:border-gray-900 bg-gray-50 dark:bg-gray-950 rounded-2xl z-10 shadow-lg"
 			id="search-options-container"
 			in:fade={{ duration: 50 }}
@@ -311,15 +314,16 @@
 				selectedIdx = 0;
 			}}
 		>
-			<div class="px-3 py-2.5 text-xs group">
+			<div class:rtl-search-options-panel={isRtl} class="px-3 py-2.5 text-xs group">
 				{#if filteredItems.length > 0}
-					<div class="px-1 font-medium dark:text-gray-300 text-gray-700 mb-1 capitalize">
+					<div class:rtl-search-options-head={isRtl} class="px-1 font-medium dark:text-gray-300 text-gray-700 mb-1 capitalize">
 						{selectedOption}
 					</div>
 
 					<div class="max-h-60 overflow-auto">
 						{#each filteredItems as item, itemIdx}
 							<button
+								class:rtl-search-option-row={isRtl}
 								class=" px-1.5 py-0.5 flex gap-1 hover:bg-gray-100 dark:hover:bg-gray-900 w-full rounded {selectedIdx ===
 								itemIdx
 									? 'bg-gray-100 dark:bg-gray-900'
@@ -338,24 +342,25 @@
 									dispatch('input');
 								}}
 							>
-								<div class="dark:text-gray-300 text-gray-700 font-medium line-clamp-1 shrink-0">
+								<div class:rtl-search-option-text={isRtl} class="dark:text-gray-300 text-gray-700 font-medium line-clamp-1 shrink-0">
 									{item.name}
 								</div>
 
-								<div class=" text-gray-500 line-clamp-1">
+								<div class:rtl-search-option-text={isRtl} class=" text-gray-500 line-clamp-1">
 									{item.id}
 								</div>
 							</button>
 						{/each}
 					</div>
 				{:else if filteredOptions.length > 0}
-					<div class="px-1 font-medium dark:text-gray-300 text-gray-700 mb-1">
+					<div class:rtl-search-options-head={isRtl} class="px-1 font-medium dark:text-gray-300 text-gray-700 mb-1">
 						{$i18n.t('Search options')}
 					</div>
 
 					<div class=" max-h-60 overflow-auto">
 						{#each filteredOptions as option, optionIdx}
 							<button
+								class:rtl-search-option-row={isRtl}
 								class=" px-1.5 py-0.5 flex gap-1 hover:bg-gray-100 dark:hover:bg-gray-900 w-full rounded {selectedIdx ===
 								optionIdx
 									? 'bg-gray-100 dark:bg-gray-900'
@@ -374,9 +379,9 @@
 									dispatch('input');
 								}}
 							>
-								<div class="dark:text-gray-300 text-gray-700 font-medium">{option.name}</div>
+								<div class:rtl-search-option-text={isRtl} class="dark:text-gray-300 text-gray-700 font-medium">{option.name}</div>
 
-								<div class=" text-gray-500 line-clamp-1">
+								<div class:rtl-search-option-text={isRtl} class=" text-gray-500 line-clamp-1">
 									{option.description}
 								</div>
 							</button>
@@ -387,3 +392,38 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.search-input {
+		text-align: start;
+	}
+
+	.search-input::placeholder {
+		direction: auto;
+		text-align: start;
+	}
+
+	.rtl-search-input .search-input {
+		direction: rtl;
+		text-align: right;
+	}
+
+	.rtl-search-shell {
+		flex-direction: row-reverse;
+	}
+
+	.rtl-search-icon {
+		border-radius: 0 0.75rem 0.75rem 0;
+	}
+
+	.rtl-search-options,
+	.rtl-search-options-panel,
+	.rtl-search-options-head,
+	.rtl-search-option-text {
+		text-align: right;
+	}
+
+	.rtl-search-option-row {
+		flex-direction: row-reverse;
+	}
+</style>
