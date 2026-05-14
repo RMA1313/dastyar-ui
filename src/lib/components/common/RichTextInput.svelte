@@ -297,8 +297,9 @@
 	let mdValue = '';
 	let editorDirection: 'auto' | 'ltr' | 'rtl' = 'auto';
 
-	const detectDirection = (text: string) => {
-		const strongChar = (text ?? '').match(
+	const detectDirection = (text: unknown) => {
+		const value = typeof text === 'string' ? text : '';
+		const strongChar = value.match(
 			/[\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFA-Za-z]/
 		)?.[0];
 
