@@ -1377,4 +1377,9 @@
 		float: inline-end;
 		text-align: right;
 	}
+
+	.chat-message-input :global(.ProseMirror p.is-editor-empty:first-child) {
+		direction: rtl;
+		text-align: right;
+	}
 </style>
