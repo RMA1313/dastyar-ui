@@ -652,10 +652,10 @@
 />
 
 {#key message.id}
-	<div
-		class=" flex w-full message-{message.id}"
+	<!-- In global RTL, assistant bubbles should stay on the visual opposite side from the user. -->
+<div
+		class=" flex w-full justify-end message-{message.id}"
 		id="message-{message.id}"
-		dir={$settings.chatDirection}
 		style="scroll-margin-top: 3rem;"
 	>
 		<div class={`shrink-0 ltr:mr-3 rtl:ml-3 hidden @lg:flex mt-1 `}>

@@ -129,7 +129,6 @@
 
 <div
 	class=" flex w-full user-message group"
-	dir={$settings.chatDirection}
 	id="message-{message.id}"
 	style="scroll-margin-top: 3rem;"
 >
@@ -367,7 +366,7 @@
 				</div>
 			{:else if message.content !== ''}
 				<div class="w-full">
-					<div class="flex {($settings?.chatBubble ?? true) ? 'justify-end pb-1' : 'w-full'}">
+					<div class="flex {($settings?.chatBubble ?? true) ? 'justify-start pb-1' : 'w-full'}">
 						<div
 							class="rounded-3xl {($settings?.chatBubble ?? true)
 								? `max-w-[90%] px-4 py-1.5  bg-gray-50 dark:bg-gray-850 ${
@@ -375,20 +374,20 @@
 									}`
 								: ' w-full'}"
 						>
-							{#if message.content}
-								{#if $settings?.renderMarkdownInUserMessages ?? true}
-									<Markdown
-										id={`${chatId}-${message.id}`}
-										content={message.content}
-										{editCodeBlock}
-										{topPadding}
-									/>
-								{:else}
-									<div class="whitespace-pre-wrap" dir={$settings?.chatDirection ?? 'auto'}>
-										{message.content}
-									</div>
+							<div dir="auto" class="text-right">
+								{#if message.content}
+									{#if $settings?.renderMarkdownInUserMessages ?? true}
+										<Markdown
+											id={`${chatId}-${message.id}`}
+											content={message.content}
+											{editCodeBlock}
+											{topPadding}
+										/>
+									{:else}
+										<div class="whitespace-pre-wrap">{message.content}</div>
+									{/if}
 								{/if}
-							{/if}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -397,7 +396,7 @@
 			{#if edit !== true}
 				<div
 					class=" flex {($settings?.chatBubble ?? true)
-						? 'justify-end'
+						? 'justify-start'
 						: ''}  text-gray-600 dark:text-gray-500"
 				>
 					{#if !($settings?.chatBubble ?? true)}

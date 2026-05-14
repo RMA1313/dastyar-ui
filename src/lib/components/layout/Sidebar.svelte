@@ -744,7 +744,7 @@
 {#if $showSidebar}
 	<div
 		class=" {$isApp
-			? ' ml-[4.5rem] md:ml-0'
+			? ' mr-[4.5rem] md:mr-0'
 			: ''} fixed md:hidden z-40 top-0 right-0 left-0 bottom-0 bg-black/60 w-full min-h-screen h-screen flex justify-center overflow-hidden overscroll-contain"
 		on:mousedown={() => {
 			showSidebar.set(!$showSidebar);
@@ -786,7 +786,7 @@
 		id="sidebar"
 	>
 		<button
-			class="flex flex-col flex-1 {isWindows ? 'cursor-pointer' : 'cursor-[e-resize]'}"
+			class="flex flex-col flex-1 {isWindows ? 'cursor-pointer' : 'cursor-[w-resize]'}"
 			on:click={async () => {
 				showSidebar.set(!$showSidebar);
 			}}
@@ -794,12 +794,12 @@
 			<div class="pb-1.5">
 				<Tooltip
 					content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-					placement="right"
+					placement="left"
 				>
 					<button
 						class="flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group {isWindows
 							? 'cursor-pointer'
-							: 'cursor-[e-resize]'}"
+							: 'cursor-[w-resize]'}"
 						aria-label={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
 					>
 						<div class=" self-center flex items-center justify-center size-9">
@@ -984,20 +984,20 @@
 <!-- {$i18n.t('New Folder')} -->
 <!-- {$i18n.t('Pinned')} -->
 
-{#if $showSidebar}
-	<div
-		bind:this={navElement}
-		id="sidebar"
-		dir={isRtl ? 'rtl' : 'ltr'}
-		class="h-screen max-h-[100dvh] min-h-screen select-none {$showSidebar
-			? `${$mobile ? 'bg-gray-50 dark:bg-gray-950' : 'bg-gray-50/70 dark:bg-gray-950/70'} z-50`
-			: ' bg-transparent z-0 '} {$isApp
-			? `ml-[4.5rem] md:ml-0 `
-			: ' transition-all duration-300 '} shrink-0 text-gray-900 dark:text-gray-200 text-sm fixed top-0 left-0 overflow-x-hidden
+	{#if $showSidebar}
+		<div
+			bind:this={navElement}
+			id="sidebar"
+			dir={isRtl ? 'rtl' : 'ltr'}
+			class="h-screen max-h-[100dvh] min-h-screen select-none {$showSidebar
+				? `${$mobile ? 'bg-gray-50 dark:bg-gray-950' : 'bg-gray-50/70 dark:bg-gray-950/70'} z-50`
+				: ' bg-transparent z-0 '} {$isApp
+				? `mr-[4.5rem] md:mr-0 `
+				: ' transition-all duration-300 '} shrink-0 text-gray-900 dark:text-gray-200 text-sm fixed top-0 right-0 overflow-x-hidden
         "
-		transition:slide={{ duration: 250, axis: 'x' }}
-		data-state={$showSidebar}
-	>
+			transition:slide={{ duration: 250, axis: 'x' }}
+			data-state={$showSidebar}
+		>
 		<div
 			class=" my-auto flex flex-col justify-between h-screen max-h-[100dvh] w-[var(--sidebar-width)] overflow-x-hidden scrollbar-hidden z-50 {$showSidebar
 				? ''
@@ -1496,7 +1496,9 @@
 									name={$i18n.t('Pinned')}
 								>
 									<div
-										class="ml-3 pl-1 mt-[1px] flex flex-col overflow-y-auto scrollbar-hidden border-s border-gray-100 dark:border-gray-900 text-gray-900 dark:text-gray-200"
+										class={isRtl
+											? 'mr-3 pr-1 mt-[1px] flex flex-col overflow-y-auto scrollbar-hidden border-s border-gray-100 dark:border-gray-900 text-gray-900 dark:text-gray-200'
+											: 'ml-3 pl-1 mt-[1px] flex flex-col overflow-y-auto scrollbar-hidden border-s border-gray-100 dark:border-gray-900 text-gray-900 dark:text-gray-200'}
 									>
 										{#each $pinnedChats as chat, idx (`pinned-chat-${chat?.id ?? idx}`)}
 											<ChatItem
@@ -1673,13 +1675,13 @@
 
 	{#if !$mobile}
 		<div
-			class="relative flex items-center justify-center group border-l border-gray-50 dark:border-gray-850/30 hover:border-gray-200 dark:hover:border-gray-800 transition z-20"
+			class="relative flex items-center justify-center group border-r border-gray-50 dark:border-gray-850/30 hover:border-gray-200 dark:hover:border-gray-800 transition z-20"
 			id="sidebar-resizer"
 			on:mousedown={resizeStartHandler}
 			role="separator"
 		>
 			<div
-				class=" absolute -left-1.5 -right-1.5 -top-0 -bottom-0 z-20 cursor-col-resize bg-transparent"
+				class=" absolute -right-1.5 -left-1.5 -top-0 -bottom-0 z-20 cursor-col-resize bg-transparent"
 			/>
 		</div>
 	{/if}

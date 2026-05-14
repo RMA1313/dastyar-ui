@@ -26,9 +26,6 @@
 	import { onMount, getContext, onDestroy } from 'svelte';
 
 	const i18n = getContext('i18n');
-	let isRtl = false;
-	$: isRtl =
-		['fa', 'fa-IR', 'fa_IR'].includes($i18n?.language) || ($i18n?.language ?? '').startsWith('fa-');
 	// Assuming $i18n.languages is an array of language codes
 	$: loadLocale($i18n.languages);
 
@@ -326,7 +323,7 @@
 
 <FilesOverlay show={dragged} />
 
-<div id="notes-container" class="w-full min-h-full h-full px-3 md:px-[18px]" dir={isRtl ? 'rtl' : 'ltr'}>
+<div id="notes-container" class="w-full min-h-full h-full px-3 md:px-[18px]">
 	{#if loaded}
 		<DeleteConfirmDialog
 			bind:show={showDeleteConfirm}
@@ -342,10 +339,10 @@
 		</DeleteConfirmDialog>
 
 		<div class="flex flex-col gap-1 px-1 mt-1.5 mb-3">
-			<div class="grid grid-cols-[1fr_auto] items-center gap-2">
-				<div class={`flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0 ${isRtl ? 'justify-self-end text-right' : 'justify-self-start'}`}>
+			<div class="flex justify-between items-center">
+				<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 					<div>
-						{isRtl ? 'یادداشت‌ها' : $i18n.t('Notes')}
+						{$i18n.t('Notes')}
 					</div>
 
 					<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -353,9 +350,9 @@
 					</div>
 				</div>
 
-				<div class={`flex w-full gap-1.5 ${isRtl ? 'justify-self-start justify-start' : 'justify-self-end justify-end'}`}>
+				<div class="flex w-full justify-end gap-1.5">
 					<button
-						class={`px-2 py-1.5 rounded-xl bg-black text-white dark:bg-white dark:text-black transition font-medium text-sm flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}
+						class=" px-2 py-1.5 rounded-xl bg-black text-white dark:bg-white dark:text-black transition font-medium text-sm flex items-center"
 						on:click={async () => {
 							const res = await createNoteHandler(dayjs().format('YYYY-MM-DD'));
 
@@ -366,7 +363,7 @@
 					>
 						<Plus className="size-3" strokeWidth="2.5" />
 
-						<div class="text-xs">{isRtl ? 'یادداشت جدید' : $i18n.t('New Note')}</div>
+						<div class=" ml-1 text-xs">{$i18n.t('New Note')}</div>
 					</button>
 				</div>
 			</div>
@@ -374,88 +371,93 @@
 
 		<div
 			class="py-2 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100/30 dark:border-gray-850/30"
-			dir={isRtl ? 'rtl' : 'ltr'}
 		>
-			<div class="px-3.5 pb-2">
-				<div class={`grid grid-cols-1 gap-2 lg:grid-cols-[minmax(0,1fr)_auto] ${isRtl ? 'lg:grid-cols-[minmax(0,1fr)_auto]' : ''}`}>
-					<div class="min-w-0">
-						<div class={`grid grid-cols-[1fr_auto] items-center gap-2 rounded-2xl border border-gray-100/30 dark:border-gray-850/30 bg-white/50 dark:bg-gray-900/40 px-3 py-2 ${isRtl ? 'text-right' : ''}`}>
-							<div class={`flex items-center min-w-0 ${isRtl ? 'flex-row-reverse justify-self-end' : ''}`}>
-								<div class={isRtl ? 'ml-2 shrink-0' : 'ml-1 mr-3 shrink-0'}>
-									<Search className="size-3.5" />
-								</div>
-								<input
-									class={`w-full min-w-0 bg-transparent text-sm outline-hidden ${isRtl ? 'pr-2 text-right' : 'text-start'}`}
-									bind:value={query}
-									placeholder={isRtl ? 'جستجوی یادداشت‌ها' : $i18n.t('Search Notes')}
-									dir={isRtl && !query ? 'rtl' : 'auto'}
-								/>
-
-								{#if query}
-									<div class={`self-center translate-y-[0.5px] bg-transparent ${isRtl ? 'pr-1.5' : 'pl-1.5'}`}>
-										<button
-											class="p-0.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 transition"
-											on:click={() => {
-												query = '';
-											}}
-										>
-											<XMark className="size-3" strokeWidth="2" />
-										</button>
-									</div>
-								{/if}
-							</div>
-
-							<div class={`flex items-center gap-2 ${isRtl ? 'justify-end' : 'justify-start'}`} />
-						</div>
-
-						<div class={`mt-2 flex flex-wrap gap-2 text-sm ${isRtl ? 'justify-end' : 'justify-start'}`}>
-							<DropdownOptions
-								align={isRtl ? 'end' : 'start'}
-								bind:value={viewOption}
-								items={[
-									{ value: null, label: $i18n.t('All') },
-									{ value: 'created', label: $i18n.t('Created by you') },
-									{ value: 'shared', label: $i18n.t('Shared with you') }
-								]}
-								onChange={(value) => {
-									if (value) {
-										localStorage.noteViewOption = value;
-									} else {
-										delete localStorage.noteViewOption;
-									}
-								}}
-							/>
-
-							{#if [null, 'shared'].includes(viewOption)}
-								<DropdownOptions
-									align={isRtl ? 'end' : 'start'}
-									bind:value={permission}
-									items={[
-										{ value: null, label: $i18n.t('Write') },
-										{ value: 'read_only', label: $i18n.t('Read Only') }
-									]}
-								/>
-							{/if}
-						</div>
+			<div class="px-3.5 flex flex-1 items-center w-full space-x-2 py-0.5 pb-2">
+				<div class="flex flex-1 items-center">
+					<div class=" self-center ml-1 mr-3">
+						<Search className="size-3.5" />
 					</div>
+					<input
+						class=" w-full text-sm py-1 rounded-r-xl outline-hidden bg-transparent"
+						bind:value={query}
+						placeholder={$i18n.t('Search Notes')}
+					/>
 
-					<div class={`flex shrink-0 items-start ${isRtl ? 'justify-self-start' : 'justify-self-end'}`}>
+					{#if query}
+						<div class="self-center pl-1.5 translate-y-[0.5px] rounded-l-xl bg-transparent">
+							<button
+								class="p-0.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+								on:click={() => {
+									query = '';
+								}}
+							>
+								<XMark className="size-3" strokeWidth="2" />
+							</button>
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<div class="px-3 flex justify-between">
+				<div
+					class="flex w-full bg-transparent overflow-x-auto scrollbar-none"
+					on:wheel={(e) => {
+						if (e.deltaY !== 0) {
+							e.preventDefault();
+							e.currentTarget.scrollLeft += e.deltaY;
+						}
+					}}
+				>
+					<div
+						class="flex gap-3 w-fit text-center text-sm rounded-full bg-transparent px-0.5 whitespace-nowrap"
+					>
 						<DropdownOptions
-							align={isRtl ? 'end' : 'start'}
-							bind:value={displayOption}
+							align="start"
+							className="flex shrink-0 items-center gap-2 px-3 py-1.5 text-sm bg-gray-50 dark:bg-gray-850 rounded-xl placeholder-gray-400 outline-hidden focus:outline-hidden"
+							bind:value={viewOption}
 							items={[
-								{ value: null, label: isRtl ? 'فهرست' : $i18n.t('List') },
-								{ value: 'grid', label: $i18n.t('Grid') }
+								{ value: null, label: $i18n.t('All') },
+								{ value: 'created', label: $i18n.t('Created by you') },
+								{ value: 'shared', label: $i18n.t('Shared with you') }
 							]}
-							onChange={() => {
-								if (displayOption) {
-									localStorage.noteDisplayOption = displayOption;
+							onChange={(value) => {
+								if (value) {
+									localStorage.noteViewOption = value;
 								} else {
-									delete localStorage.noteDisplayOption;
+									delete localStorage.noteViewOption;
 								}
 							}}
 						/>
+
+						{#if [null, 'shared'].includes(viewOption)}
+							<DropdownOptions
+								align="start"
+								bind:value={permission}
+								items={[
+									{ value: null, label: $i18n.t('Write') },
+									{ value: 'read_only', label: $i18n.t('Read Only') }
+								]}
+							/>
+						{/if}
 					</div>
+				</div>
+
+				<div class="shrink-0">
+					<DropdownOptions
+						align="start"
+						bind:value={displayOption}
+						items={[
+							{ value: null, label: $i18n.t('List') },
+							{ value: 'grid', label: $i18n.t('Grid') }
+						]}
+						onChange={() => {
+							if (displayOption) {
+								localStorage.noteDisplayOption = displayOption;
+							} else {
+								delete localStorage.noteDisplayOption;
+							}
+						}}
+					/>
 				</div>
 			</div>
 
@@ -466,75 +468,101 @@
 					<div class="@container h-full py-2.5 px-2.5">
 						<div class="">
 							{#each groupedNotes as [timeRange, notesList], idx}
-								<div class={`w-full text-xs text-gray-500 dark:text-gray-500 font-medium px-2.5 pb-2.5 ${isRtl ? 'text-right' : ''}`}>
+								<div
+									class="w-full text-xs text-gray-500 dark:text-gray-500 font-medium px-2.5 pb-2.5"
+								>
 									{$i18n.t(timeRange)}
 								</div>
 
 								{#if displayOption === null}
-									<div class={`${groupedNotes.length - 1 !== idx ? 'mb-3' : ''} flex flex-col gap-2`}>
+									<div
+										class="{groupedNotes.length - 1 !== idx ? 'mb-3' : ''} gap-1.5 flex flex-col"
+									>
 										{#each notesList as note, idx (note.id)}
 											<div
-												class={`flex cursor-pointer w-full items-start gap-2 px-3.5 py-2 border border-gray-50 dark:border-gray-850/30 bg-transparent dark:hover:bg-gray-850 hover:bg-white rounded-2xl transition ${isRtl ? 'flex-row-reverse' : ''}`}
+												class=" flex cursor-pointer w-full px-3.5 py-1.5 border border-gray-50 dark:border-gray-850/30 bg-transparent dark:hover:bg-gray-850 hover:bg-white rounded-2xl transition"
 											>
-												<div class="min-w-0 flex-1">
-													<a href={`/notes/${note.id}`} class="block w-full min-w-0" dir={isRtl ? 'rtl' : 'ltr'}>
-														<div class={`text-sm font-medium capitalize line-clamp-1 ${isRtl ? 'text-right' : ''}`}>
-															{note.title}
+												<a href={`/notes/${note.id}`} class="w-full flex flex-col justify-between">
+													<div class="flex-1">
+														<div class="  flex items-center gap-2 self-center justify-between">
+															<Tooltip
+																content={note.title}
+																className="flex-1"
+																placement="top-start"
+															>
+																<div
+																	class=" text-sm font-medium capitalize flex-1 w-full line-clamp-1"
+																>
+																	{note.title}
+																</div>
+															</Tooltip>
+
+															<div class="flex shrink-0 items-center text-xs gap-2.5">
+																<Tooltip content={dayjs(note.updated_at / 1000000).format('LLLL')}>
+																	<div>
+																		{dayjs(note.updated_at / 1000000).fromNow()}
+																	</div>
+																</Tooltip>
+																<Tooltip
+																	content={note?.user?.email ?? $i18n.t('Deleted User')}
+																	className="flex shrink-0"
+																	placement="top-start"
+																>
+																	<div class="shrink-0 text-gray-500">
+																		{$i18n.t('By {{name}}', {
+																			name: capitalizeFirstLetter(
+																				note?.user?.name ??
+																					note?.user?.email ??
+																					$i18n.t('Deleted User')
+																			)
+																		})}
+																	</div>
+																</Tooltip>
+
+																<div>
+																	<NoteMenu
+																		onDownload={(type) => {
+																			selectedNote = note;
+
+																			downloadHandler(type);
+																		}}
+																		onCopyLink={async () => {
+																			const baseUrl = window.location.origin;
+																			const res = await copyToClipboard(
+																				`${baseUrl}/notes/${note.id}`
+																			);
+
+																			if (res) {
+																				toast.success($i18n.t('Copied link to clipboard'));
+																			} else {
+																				toast.error($i18n.t('Failed to copy link'));
+																			}
+																		}}
+																		onDelete={() => {
+																			selectedNote = note;
+																			showDeleteConfirm = true;
+																		}}
+																		isPinned={note.is_pinned ?? false}
+																		onPin={async () => {
+																			await toggleNotePinnedStatusById(localStorage.token, note.id);
+																			pinnedNotes.set(
+																				await getPinnedNoteList(localStorage.token).catch(() => [])
+																			);
+																			init();
+																		}}
+																	>
+																		<button
+																			class="self-center w-fit text-sm p-1 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
+																			type="button"
+																		>
+																			<EllipsisHorizontal className="size-5" />
+																		</button>
+																	</NoteMenu>
+																</div>
+															</div>
 														</div>
-
-														<div class={`mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 dark:text-gray-500 ${isRtl ? 'justify-end' : 'justify-start'} ${isRtl ? 'text-right' : ''}`}>
-															<span dir="ltr">{dayjs(note.updated_at / 1000000).fromNow()}</span>
-															<span aria-hidden="true">·</span>
-															<span dir="auto">
-																{$i18n.t('By {{name}}', {
-																	name: capitalizeFirstLetter(
-																		note?.user?.name ??
-																			note?.user?.email ??
-																			$i18n.t('Deleted User')
-																	)
-																})}
-															</span>
-														</div>
-													</a>
-												</div>
-
-												<NoteMenu
-														onDownload={(type) => {
-															selectedNote = note;
-
-															downloadHandler(type);
-														}}
-														onCopyLink={async () => {
-															const baseUrl = window.location.origin;
-															const res = await copyToClipboard(`${baseUrl}/notes/${note.id}`);
-
-															if (res) {
-																toast.success($i18n.t('Copied link to clipboard'));
-															} else {
-																toast.error($i18n.t('Failed to copy link'));
-															}
-														}}
-														onDelete={() => {
-															selectedNote = note;
-															showDeleteConfirm = true;
-														}}
-														isPinned={note.is_pinned ?? false}
-														onPin={async () => {
-															await toggleNotePinnedStatusById(localStorage.token, note.id);
-															pinnedNotes.set(
-																await getPinnedNoteList(localStorage.token).catch(() => [])
-															);
-															init();
-														}}
-														>
-														<button
-															class="shrink-0 self-start w-fit p-1 text-sm rounded-xl dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
-															type="button"
-															aria-label={$i18n.t('More')}
-														>
-															<EllipsisHorizontal className="size-5" />
-														</button>
-													</NoteMenu>
+													</div>
+												</a>
 											</div>
 										{/each}
 									</div>
@@ -546,19 +574,18 @@
 									>
 										{#each notesList as note, idx (note.id)}
 											<div
-												class={`flex cursor-pointer w-full px-4.5 py-4 border border-gray-50 dark:border-gray-850/30 bg-transparent dark:hover:bg-gray-850 hover:bg-white rounded-2xl transition ${isRtl ? 'flex-row-reverse' : 'space-x-4'}`}
+												class=" flex space-x-4 cursor-pointer w-full px-4.5 py-4 border border-gray-50 dark:border-gray-850/30 bg-transparent dark:hover:bg-gray-850 hover:bg-white rounded-2xl transition"
 											>
-												<div class={`flex flex-1 cursor-pointer w-full ${isRtl ? 'flex-row-reverse' : 'space-x-4'}`}>
+												<div class=" flex flex-1 space-x-4 cursor-pointer w-full">
 													<a
 														href={`/notes/${note.id}`}
 														class="w-full -translate-y-0.5 flex flex-col justify-between"
-														dir={isRtl ? 'rtl' : 'ltr'}
 													>
 														<div class="flex-1">
 															<div
-																class={`flex items-center gap-2 self-center mb-1 justify-between ${isRtl ? 'flex-row-reverse' : ''}`}
+																class="  flex items-center gap-2 self-center mb-1 justify-between"
 															>
-																<div class={`font-semibold line-clamp-1 capitalize ${isRtl ? 'text-right' : ''}`}>
+																<div class=" font-semibold line-clamp-1 capitalize">
 																	{note.title}
 																</div>
 
@@ -604,7 +631,9 @@
 																</div>
 															</div>
 
-															<div class={`text-xs text-gray-500 dark:text-gray-500 mb-3 line-clamp-3 min-h-10 ${isRtl ? 'text-right' : ''}`} dir={isRtl ? 'auto' : 'ltr'}>
+															<div
+																class=" text-xs text-gray-500 dark:text-gray-500 mb-3 line-clamp-3 min-h-10"
+															>
 																{#if note.data?.content?.md}
 																	{note.data?.content?.md}
 																{:else}
@@ -613,8 +642,8 @@
 															</div>
 														</div>
 
-														<div class={`text-xs px-0.5 w-full flex justify-between items-center ${isRtl ? 'flex-row-reverse' : ''}`}>
-															<div dir="ltr">
+														<div class=" text-xs px-0.5 w-full flex justify-between items-center">
+															<div>
 																{dayjs(note.updated_at / 1000000).fromNow()}
 															</div>
 															<Tooltip
@@ -622,7 +651,7 @@
 																className="flex shrink-0"
 																placement="top-start"
 															>
-																<div class="shrink-0 text-gray-500" dir="auto">
+																<div class="shrink-0 text-gray-500">
 																	{$i18n.t('By {{name}}', {
 																		name: capitalizeFirstLetter(
 																			note?.user?.name ??
@@ -660,16 +689,14 @@
 						</div>
 					</div>
 				{:else}
-					<div class="w-full h-full flex flex-col items-center justify-center" dir={isRtl ? 'rtl' : 'ltr'}>
+					<div class="w-full h-full flex flex-col items-center justify-center">
 						<div class="py-20 text-center">
-							<div class="text-sm text-gray-400 dark:text-gray-600">
-								{isRtl ? 'هنوز یادداشتی ندارید' : $i18n.t('No Notes')}
+							<div class=" text-sm text-gray-400 dark:text-gray-600">
+								{$i18n.t('No Notes')}
 							</div>
 
 							<div class="mt-1 text-xs text-gray-300 dark:text-gray-700">
-								{isRtl
-									? 'برای ساخت اولین یادداشت، روی «یادداشت جدید» کلیک کنید.'
-									: $i18n.t('Create your first note by clicking on the plus button below.')}
+								{$i18n.t('Create your first note by clicking on the plus button below.')}
 							</div>
 						</div>
 					</div>
