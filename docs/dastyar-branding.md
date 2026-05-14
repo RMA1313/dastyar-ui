@@ -3,9 +3,10 @@
 ## 1. Goal
 
 - Product name: `دستیار`
+- English transliteration when needed: `Dastyar`
 - Language: Persian / Farsi
-- Direction: RTL
-- Font: Vazirmatn
+- Direction: keep existing LTR layout for this branding pass
+- Font: keep existing fonts
 - Keep Open WebUI upstream compatibility.
 
 ## 2. Upstream-friendly strategy
@@ -23,7 +24,6 @@ Preferred files and directories:
 
 - `src/lib/i18n/**`
 - `src/routes/+layout.svelte`
-- `src/app.css`
 - `src/app.html`
 - `src/routes/auth/+page.svelte` only if needed for visible auth branding/localization
 - `static/manifest.json`
@@ -31,6 +31,7 @@ Preferred files and directories:
 - `static/opensearch.xml`
 - `static/favicon*`
 - `static/static/logo*`
+- `static/brand/*` when custom brand assets are added later
 - `docs/**`
 
 ## 4. Avoided change areas
@@ -40,7 +41,7 @@ Do not modify unless absolutely necessary:
 - `backend/**`
 - `src/lib/apis/**`
 - `src/lib/utils/**`
-- `src/lib/components/**` except tiny RTL fixes if required
+- `src/lib/components/**` except tiny visible-title edits if required
 - `package.json`
 - `package-lock.json`
 - lockfiles
@@ -51,12 +52,9 @@ Do not modify unless absolutely necessary:
 Use this exact sequence:
 
 - `docs: document Dastyar branding strategy`
-- `i18n: improve Persian localization`
-- `rtl: apply global Persian direction`
-- `font: use Vazirmatn for Persian UI`
 - `branding: update visible app identity to Dastyar`
 - `theme: add Dastyar brand colors`
-- `auth: verify Persian RTL auth experience`
+- `auth: verify branding-only auth experience`
 - `docs: add testing and maintenance notes`
 
 ## 6. Implementation principles
@@ -65,7 +63,7 @@ Use this exact sequence:
 - Do not create duplicate locale structures unnecessarily.
 - Keep `fa` as the preferred Persian locale if supported.
 - Preserve compatibility with existing Persian variants such as `fa-IR` if they exist.
-- Set RTL at document level only when Persian is active.
+- Do not implement RTL in this pass.
 - Keep code blocks and monospace content LTR.
 - Keep auth behavior unchanged.
 - Replace only visible branding, not internal package names or backend identifiers.
@@ -111,3 +109,9 @@ npm run build
 ```
 
 Finish with a manual UI smoke test.
+
+## 9. Asset handling
+
+- If `static/brand/dastyar-logo.svg`, `static/brand/dastyar-logo-dark.svg`, `static/brand/dastyar-icon.svg`, `static/brand/favicon.png`, or `static/brand/apple-touch-icon.png` are missing, leave existing asset references in place.
+- Current visible branding continues to use the existing `static/favicon*`, `static/splash*`, and `static/static/*` assets.
+- If you want a custom brand image later, place it under `static/brand/` and update only the explicit references you control.
