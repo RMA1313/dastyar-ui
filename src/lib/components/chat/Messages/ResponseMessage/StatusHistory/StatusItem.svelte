@@ -49,11 +49,11 @@
 				</div>
 			</div>
 		{:else if status?.action === 'web_search_queries_generated' && status?.queries}
-			<div class="flex flex-col justify-center -space-y-0.5">
+			<div class="flex flex-col justify-center -space-y-0.5" dir="rtl">
 				<div
 					class="{(done || status?.done) === false
 						? 'shimmer'
-						: ''} text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap"
+						: ''} text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap text-right"
 				>
 					{$i18n.t(`Searching`)}
 				</div>

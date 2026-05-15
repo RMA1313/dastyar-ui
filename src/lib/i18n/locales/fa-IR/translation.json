@@ -2320,5 +2320,18 @@
 	"Your usage stats have been successfully synced.": "",
 	"YouTube": "یوتیوب",
 	"Youtube Language": "زبان یوتیوب",
-	"Youtube Proxy URL": "آدرس پراکسی یوتیوب"
+	"Youtube Proxy URL": "آدرس پراکسی یوتیوب",
+	"Input tokens": "تعداد توکن‌های ورودی",
+	"Output tokens": "تعداد توکن‌های خروجی",
+	"Total tokens": "تعداد توکن‌های کل",
+	"Prompt tokens": "تعداد توکن‌های ورودی",
+	"Completion tokens": "تعداد توکن‌های خروجی",
+	"Response tokens": "تعداد توکن‌های پاسخ",
+	"Response tokens/s": "نرخ توکن‌های پاسخ در ثانیه",
+	"Total duration": "مدت زمان کل",
+	"Load duration": "مدت زمان بارگذاری",
+	"Prompt eval count": "تعداد توکن‌های ورودی",
+	"Prompt eval duration": "مدت زمان ارزیابی ورودی",
+	"Eval count": "تعداد توکن‌های خروجی",
+	"Eval duration": "مدت زمان ارزیابی خروجی"
 }

@@ -65,6 +65,49 @@
 	import FullHeightIframe from '$lib/components/common/FullHeightIframe.svelte';
 	import OutputEditView from './OutputEditView.svelte';
 
+	const usageLabelKeys = {
+		input_tokens: 'Input tokens',
+		output_tokens: 'Output tokens',
+		total_tokens: 'Total tokens',
+		prompt_tokens: 'Prompt tokens',
+		completion_tokens: 'Completion tokens',
+		response_tokens: 'Response tokens',
+		response_token_s: 'Response tokens/s',
+		total_duration: 'Total duration',
+		load_duration: 'Load duration',
+		prompt_eval_count: 'Prompt eval count',
+		prompt_eval_duration: 'Prompt eval duration',
+		eval_count: 'Eval count',
+		eval_duration: 'Eval duration'
+	};
+
+	const formatUsageLabel = (key: string) => $i18n.t(usageLabelKeys[key] ?? key);
+
+	const formatUsageValue = (key: string, value: any): string => {
+		if (value && typeof value === 'object' && !Array.isArray(value)) {
+			return Object.entries(value)
+				.map(([childKey, childValue]) => formatUsageEntry(childKey, childValue))
+				.join('\n');
+		}
+
+		return String(value);
+	};
+
+	const formatUsageEntry = (key: string, value: any): string => {
+		if (key === 'response_token_s' || key === 'response_tokens_per_second' || key === 'response_token/s') {
+			return `${formatUsageLabel('response_token_s')}: ${formatUsageValue(key, value)}`;
+		}
+
+		return `${formatUsageLabel(key)}: ${formatUsageValue(key, value)}`;
+	};
+
+	const formatUsageTooltip = (usage: Record<string, any>) =>
+		`<pre>${sanitizeResponseContent(
+			Object.entries(usage)
+				.map(([key, value]) => formatUsageEntry(key, value))
+				.join('\n')
+		)}</pre>`;
+
 	interface MessageType {
 		id: string;
 		model: string;
@@ -1144,17 +1187,7 @@
 
 								{#if message.usage}
 									<Tooltip
-										content={message.usage
-											? `<pre>${sanitizeResponseContent(
-													JSON.stringify(message.usage, null, 2)
-														.replace(/"([^(")"]+)":/g, '$1:')
-														.slice(1, -1)
-														.split('\n')
-														.map((line) => line.slice(2))
-														.map((line) => (line.endsWith(',') ? line.slice(0, -1) : line))
-														.join('\n')
-												)}</pre>`
-											: ''}
+										content={message.usage ? formatUsageTooltip(message.usage as Record<string, any>) : ''}
 										placement="bottom"
 									>
 										<button
