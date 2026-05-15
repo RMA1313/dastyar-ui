@@ -328,7 +328,7 @@
 				</div>
 			{:else}
 				<table
-					class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table-auto max-w-full px-2"
+					class="w-full text-sm text-start text-gray-500 dark:text-gray-400 table-auto max-w-full px-2"
 				>
 					<thead class="text-xs text-gray-800 uppercase bg-transparent dark:text-gray-200">
 						<tr class=" border-b-[1.5px] border-gray-50 dark:border-gray-850/30">

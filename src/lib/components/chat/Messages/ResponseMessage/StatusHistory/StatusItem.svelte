@@ -77,14 +77,15 @@
 		{:else if status?.action === 'queries_generated' && status?.queries}
 			<div class="flex flex-col justify-center -space-y-0.5">
 				<div
+					dir="rtl"
 					class="{(done || status?.done) === false
 						? 'shimmer'
-						: ''} text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap"
+						: ''} text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap text-right"
 				>
 					{$i18n.t(`Querying`)}
 				</div>
 
-				<div class=" flex gap-1 flex-wrap mt-2">
+				<div class=" flex gap-1 flex-wrap mt-2" dir="ltr">
 					{#each status.queries as query, idx (query)}
 						<div
 							class="bg-gray-50 dark:bg-gray-850 flex rounded-lg py-1 px-2 items-center gap-1 text-xs"

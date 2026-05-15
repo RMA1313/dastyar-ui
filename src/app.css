@@ -122,6 +122,14 @@ textarea::placeholder {
 	font-family: 'Archivo', 'Vazirmatn', sans-serif;
 }
 
+/* Make table content behave predictably in RTL documents, especially for mixed numeric text. */
+:global(html[dir='rtl'] table th),
+:global(html[dir='rtl'] table td) {
+	text-align: start;
+	unicode-bidi: plaintext;
+	vertical-align: middle;
+}
+
 .drag-region {
 	-webkit-app-region: drag;
 }

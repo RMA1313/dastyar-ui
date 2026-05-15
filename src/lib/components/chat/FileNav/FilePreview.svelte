@@ -443,25 +443,25 @@
 			</div>
 		{:else if isCsv && !showRaw && csvRows.length > 0}
 			<div class="absolute inset-0 overflow-auto px-3 pb-3">
-				<table class="csv-table text-xs font-mono border-collapse">
+				<table class="csv-table text-xs font-mono border-collapse" dir="rtl">
 					<thead>
 						<tr>
-							<th class="csv-row-num">#</th>
+							<th class="csv-row-num" style="text-align: start; unicode-bidi: plaintext; vertical-align: middle;">#</th>
 							{#each csvHeader as cell}
-								<th>{cell}</th>
+								<th style="text-align: start; unicode-bidi: plaintext; vertical-align: middle;">{cell}</th>
 							{/each}
 						</tr>
 					</thead>
 					<tbody>
 						{#each csvBody as row, i}
 							<tr>
-								<td class="csv-row-num">{i + 1}</td>
+								<td class="csv-row-num" style="text-align: start; unicode-bidi: plaintext; vertical-align: middle;">{i + 1}</td>
 								{#each row as cell}
-									<td>{cell}</td>
+									<td style="text-align: start; unicode-bidi: plaintext; vertical-align: middle;">{cell}</td>
 								{/each}
 								<!-- Pad missing columns -->
 								{#each Array(Math.max(0, csvHeader.length - row.length)) as _}
-									<td></td>
+									<td style="text-align: start; unicode-bidi: plaintext; vertical-align: middle;"></td>
 								{/each}
 							</tr>
 						{/each}

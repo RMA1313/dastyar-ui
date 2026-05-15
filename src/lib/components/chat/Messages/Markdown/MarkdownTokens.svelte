@@ -183,7 +183,7 @@
 			<div class="scrollbar-hidden relative overflow-x-auto max-w-full">
 				<table
 					class=" w-full text-sm text-start text-gray-500 dark:text-gray-400 max-w-full rounded-xl"
-					dir="auto"
+					dir="rtl"
 				>
 					<thead
 						class="text-xs text-gray-700 uppercase bg-white dark:bg-gray-900 dark:text-gray-400 border-none"
@@ -193,10 +193,10 @@
 								<th
 									scope="col"
 									class="px-2.5! py-2! cursor-pointer border-b border-gray-100! dark:border-gray-800!"
-									style={token.align[headerIdx] ? `text-align: ${token.align[headerIdx]}` : ''}
+									style={`${token.align[headerIdx] ? `text-align: ${token.align[headerIdx]}; ` : ''}text-align: start; unicode-bidi: plaintext; vertical-align: middle;`}
 								>
-									<div class="gap-1.5 text-start">
-										<div class="shrink-0 break-normal">
+									<div class="gap-1.5 text-start" style="text-align: start; unicode-bidi: plaintext; direction: ltr;">
+										<div class="shrink-0 break-normal" style="text-align: start; unicode-bidi: plaintext; direction: ltr;">
 											<MarkdownInlineTokens
 												id={`${id}-${tokenIdx}-header-${headerIdx}`}
 												tokens={header.tokens}
@@ -220,9 +220,9 @@
 										rowIdx
 											? ''
 											: 'border-b border-gray-50! dark:border-gray-850!'}"
-										style={token.align[cellIdx] ? `text-align: ${token.align[cellIdx]}` : ''}
+										style={`${token.align[cellIdx] ? `text-align: ${token.align[cellIdx]}; ` : ''}text-align: start; unicode-bidi: plaintext; vertical-align: middle;`}
 									>
-										<div class="break-normal">
+										<div class="break-normal" style="text-align: start; unicode-bidi: plaintext; direction: ltr;">
 											<MarkdownInlineTokens
 												id={`${id}-${tokenIdx}-row-${rowIdx}-${cellIdx}`}
 												tokens={cell.tokens}

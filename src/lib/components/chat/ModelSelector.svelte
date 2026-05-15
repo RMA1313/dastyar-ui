@@ -130,7 +130,7 @@
 
 {#if showSetDefault}
 	<div
-		class="relative text-left mt-[1px] ml-1 text-[0.7rem] text-gray-600 dark:text-gray-400 font-primary"
+		class="relative text-right mt-[1px] ml-1 text-[0.7rem] text-gray-600 dark:text-gray-400 font-primary"
 	>
 		<button on:click={saveDefaultModel}> {$i18n.t('Set as default')}</button>
 	</div>

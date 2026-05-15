@@ -170,7 +170,7 @@
 
 					{#if onAdd}
 						<button
-							class="absolute z-10 right-2 invisible group-hover:visible self-center flex items-center dark:text-gray-300"
+							class="absolute z-10 left-2 invisible group-hover:visible self-center flex items-center dark:text-gray-300"
 							on:pointerup={(e) => {
 								e.stopPropagation();
 							}}
