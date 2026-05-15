@@ -18,6 +18,7 @@ Install dependencies and start the Svelte frontend from the project root:
 
 ```bash
 npm install
+npm run build
 npm run dev
 ```
 
@@ -29,8 +30,8 @@ Run the backend separately from the `backend` directory:
 
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\Activate.ps1
+py -3.11 -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
 python -m uvicorn open_webui.main:app --host 0.0.0.0 --port 8080 --reload
 ```
