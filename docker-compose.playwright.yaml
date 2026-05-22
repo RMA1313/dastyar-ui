@@ -1,7 +1,11 @@
 services:
   playwright:
-    image: mcr.microsoft.com/playwright:v1.58.0-noble # Version must match requirements.txt
+    image: ${PLAYWRIGHT_IMAGE:-mcr.microsoft.com/playwright:v1.58.0-noble} # Version must match requirements.txt
     container_name: playwright
+    environment:
+      - USE_NEXUS=${USE_NEXUS:-false}
+      - NEXUS_BASE_URL=${NEXUS_BASE_URL:-http://host.docker.internal:8081/repository}
+      - PLAYWRIGHT_DOWNLOAD_HOST=${PLAYWRIGHT_DOWNLOAD_HOST:-}
     command: npx -y playwright@1.58.0 run-server --port 3000 --host 0.0.0.0
 
   open-webui:

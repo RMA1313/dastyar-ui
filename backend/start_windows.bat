@@ -6,15 +6,28 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 SET "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%" || exit /b
 
+SET "USE_NEXUS=%USE_NEXUS%"
+SET "NEXUS_BASE_URL=%NEXUS_BASE_URL%"
+IF "%NEXUS_BASE_URL%"=="" SET "NEXUS_BASE_URL=http://host.docker.internal:8081/repository"
+SET "NLTK_DATA=%SCRIPT_DIR%nltk_data"
+IF NOT EXIST "%NLTK_DATA%" mkdir "%NLTK_DATA%"
+
 :: Add conditional Playwright browser installation
 IF /I "%WEB_LOADER_ENGINE%" == "playwright" (
     IF "%PLAYWRIGHT_WS_URL%" == "" (
         echo Installing Playwright browsers...
+        IF /I "%USE_NEXUS%" == "true" (
+            IF NOT "%PLAYWRIGHT_DOWNLOAD_HOST%" == "" (
+                set "PLAYWRIGHT_DOWNLOAD_HOST=%PLAYWRIGHT_DOWNLOAD_HOST%"
+            ) ELSE (
+                set "PLAYWRIGHT_DOWNLOAD_HOST=%NEXUS_BASE_URL%/playwright"
+            )
+        )
         playwright install chromium
         playwright install-deps chromium
     )
 
-    python -c "import nltk; nltk.download('punkt_tab')"
+    python -c "import os, nltk; nltk.download('punkt_tab', download_dir=os.environ['NLTK_DATA'])"
 )
 
 SET "KEY_FILE=.webui_secret_key"

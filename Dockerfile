@@ -5,6 +5,8 @@ ARG USE_CUDA=false
 ARG USE_OLLAMA=false
 ARG USE_SLIM=false
 ARG USE_PERMISSION_HARDENING=false
+ARG USE_NEXUS=false
+ARG NEXUS_BASE_URL=http://host.docker.internal:8081/repository
 # Tested with cu117 for CUDA 11 and cu121 for CUDA 12 (default)
 ARG USE_CUDA_VER=cu128
 # any sentence transformer model; models to use can be found at https://huggingface.co/models?library=sentence-transformers
@@ -24,8 +26,10 @@ ARG UID=0
 ARG GID=0
 
 ######## WebUI frontend ########
-FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
+FROM node:22-alpine3.20 AS build
 ARG BUILD_HASH
+ARG USE_NEXUS
+ARG NEXUS_BASE_URL
 
 # Set Node.js options (heap limit Allocation failed - JavaScript heap out of memory)
 # ENV NODE_OPTIONS="--max-old-space-size=4096"
@@ -34,9 +38,13 @@ WORKDIR /app
 
 # to store git revision in build
 RUN apk add --no-cache git
-
 COPY package.json package-lock.json ./
-RUN npm ci --force
+RUN if [ "$USE_NEXUS" = "true" ]; then \
+        NEXUS_NPM_REGISTRY="${NEXUS_BASE_URL}/npm-proxy/"; \
+        if npm view npm version --registry "$NEXUS_NPM_REGISTRY" >/dev/null 2>&1; then \
+            npm config set registry "$NEXUS_NPM_REGISTRY"; \
+        fi; \
+    fi && npm ci --force
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
@@ -56,6 +64,8 @@ ARG USE_RERANKING_MODEL
 ARG USE_AUXILIARY_EMBEDDING_MODEL
 ARG UID
 ARG GID
+ARG USE_NEXUS
+ARG NEXUS_BASE_URL
 
 # Python settings
 ENV PYTHONUNBUFFERED=1
@@ -139,30 +149,31 @@ COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
 ENV UV_LINK_MODE=copy
 
 RUN set -e; \
+    if [ "$USE_NEXUS" = "true" ] && python -c "import sys, urllib.request; urllib.request.urlopen(sys.argv[1].rstrip('/') + '/pip/', timeout=5).read(1)" "${NEXUS_BASE_URL}/pypi-proxy/simple" >/dev/null 2>&1; then \
+        PIP_INDEX_URL="${NEXUS_BASE_URL}/pypi-proxy/simple"; \
+    fi; \
     pip3 install --no-cache-dir uv; \
     if [ "$USE_CUDA" = "true" ]; then \
-    # If you use CUDA the whisper and embedding model will be downloaded on first use
-    # fix: pin torch<=2.9.1 - torch 2.10.0 aarch64 wheels cause SIGILL on ARM devices (RPi 4 Cortex-A72) #21349
-    pip3 install 'torch<=2.9.1' torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir; \
-    uv pip install --system -r requirements.txt --no-cache-dir; \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')"; \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ.get('AUXILIARY_EMBEDDING_MODEL', 'TaylorAI/bge-micro-v2'), device='cpu')"; \
-    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-    python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-    python -c "import nltk; nltk.download('punkt_tab')"; \
+        pip3 install 'torch<=2.9.1' torchvision torchaudio --index-url "${PIP_INDEX_URL:-https://pypi.org/simple}" --no-cache-dir; \
+        uv pip install --system -r requirements.txt --index-url "${PIP_INDEX_URL:-https://pypi.org/simple}" --no-cache-dir; \
+        python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')"; \
+        python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ.get('AUXILIARY_EMBEDDING_MODEL', 'TaylorAI/bge-micro-v2'), device='cpu')"; \
+        python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
+        python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+        python -c "import nltk; nltk.download('punkt_tab')"; \
     else \
-    pip3 install 'torch<=2.9.1' torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir; \
-    uv pip install --system -r requirements.txt --no-cache-dir; \
-    if [ "$USE_SLIM" != "true" ]; then \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')"; \
-    python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ.get('AUXILIARY_EMBEDDING_MODEL', 'TaylorAI/bge-micro-v2'), device='cpu')"; \
-    python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
-    python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
-    python -c "import nltk; nltk.download('punkt_tab')"; \
-    fi; \
+        pip3 install 'torch<=2.9.1' torchvision torchaudio --index-url "${PIP_INDEX_URL:-https://pypi.org/simple}" --no-cache-dir; \
+        uv pip install --system -r requirements.txt --index-url "${PIP_INDEX_URL:-https://pypi.org/simple}" --no-cache-dir; \
+        if [ "$USE_SLIM" != "true" ]; then \
+            python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ['RAG_EMBEDDING_MODEL'], device='cpu')"; \
+            python -c "import os; from sentence_transformers import SentenceTransformer; SentenceTransformer(os.environ.get('AUXILIARY_EMBEDDING_MODEL', 'TaylorAI/bge-micro-v2'), device='cpu')"; \
+            python -c "import os; from faster_whisper import WhisperModel; WhisperModel(os.environ['WHISPER_MODEL'], device='cpu', compute_type='int8', download_root=os.environ['WHISPER_MODEL_DIR'])"; \
+            python -c "import os; import tiktoken; tiktoken.get_encoding(os.environ['TIKTOKEN_ENCODING_NAME'])"; \
+            python -c "import nltk; nltk.download('punkt_tab')"; \
+        fi; \
     fi; \
     mkdir -p /app/backend/data; chown -R $UID:$GID /app/backend/data/; \
-    rm -rf /var/lib/apt/lists/*;
+    rm -rf /var/lib/apt/lists/*
 
 # Install Ollama if requested
 RUN if [ "$USE_OLLAMA" = "true" ]; then \

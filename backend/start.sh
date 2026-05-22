@@ -3,15 +3,26 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$SCRIPT_DIR" || exit
 
+use_nexus="${USE_NEXUS,,}"
+nexus_base_url="${NEXUS_BASE_URL:-http://host.docker.internal:8081/repository}"
+nexus_playwright_mirror="${PLAYWRIGHT_DOWNLOAD_HOST:-${nexus_base_url%/}/playwright}"
+nltk_data_dir="${NLTK_DATA_DIR:-$SCRIPT_DIR/nltk_data}"
+mkdir -p "$nltk_data_dir"
+export NLTK_DATA="$nltk_data_dir"
+
 # Add conditional Playwright browser installation
 if [[ "${WEB_LOADER_ENGINE,,}" == "playwright" ]]; then
     if [[ -z "${PLAYWRIGHT_WS_URL}" ]]; then
         echo "Installing Playwright browsers..."
-        playwright install chromium
+        if [[ "$use_nexus" == "true" && -n "$PLAYWRIGHT_DOWNLOAD_HOST" ]]; then
+            PLAYWRIGHT_DOWNLOAD_HOST="$nexus_playwright_mirror" playwright install chromium
+        else
+            playwright install chromium
+        fi
         playwright install-deps chromium
     fi
 
-    python -c "import nltk; nltk.download('punkt_tab')"
+    python -c "import os, nltk; nltk.download('punkt_tab', download_dir=os.environ['NLTK_DATA'])"
 fi
 
 if [ -n "${WEBUI_SECRET_KEY_FILE}" ]; then

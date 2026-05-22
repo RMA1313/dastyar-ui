@@ -28,6 +28,10 @@ import { loadPyodide } from 'pyodide';
 import { setGlobalDispatcher, ProxyAgent } from 'undici';
 import { writeFile, readFile, copyFile, readdir, rmdir, access } from 'fs/promises';
 
+const useNexus = String(process.env.USE_NEXUS || '').toLowerCase() === 'true';
+const nexusBaseUrl = process.env.NEXUS_BASE_URL || 'http://host.docker.internal:8081/repository';
+const pypiIndexUrl = 'https://pypi.org/pypi';
+
 /**
  * Loading network proxy configurations from the environment variables.
  * And the proxy config with lowercase name has the highest priority to use.
@@ -140,13 +144,31 @@ async function downloadPyPIWheels() {
 	}
 
 	for (const pkg of pypiPackages) {
-		console.log(`Fetching PyPI metadata for: ${pkg}`);
-		const res = await fetch(`https://pypi.org/pypi/${pkg}/json`);
-		if (!res.ok) {
-			console.error(`Failed to fetch PyPI metadata for ${pkg}: ${res.status}`);
+		const metadataUrls = [];
+		if (useNexus) {
+			metadataUrls.push(`${nexusBaseUrl.replace(/\/$/, '')}/pypi-proxy/${pkg}/json`);
+		}
+		metadataUrls.push(`${pypiIndexUrl}/${pkg}/json`);
+
+		let meta = null;
+		let metadataSource = null;
+		for (const url of metadataUrls) {
+			console.log(`Fetching package metadata: ${pkg} from ${url}`);
+			const res = await fetch(url);
+			if (!res.ok) {
+				continue;
+			}
+			meta = await res.json();
+			metadataSource = url;
+			break;
+		}
+
+		if (!meta) {
+			console.error(`Failed to fetch package metadata for ${pkg}`);
 			continue;
 		}
-		const meta = await res.json();
+
+		console.log(`Using metadata source for ${pkg}: ${metadataSource}`);
 		const version = meta.info.version;
 		const files = meta.urls || [];
 		// Find the pure-Python wheel (py3-none-any)
@@ -164,9 +186,24 @@ async function downloadPyPIWheels() {
 			console.log(`  Already exists: ${wheel.filename}`);
 		} catch {
 			console.log(`  Downloading: ${wheel.filename}`);
-			const wheelRes = await fetch(wheel.url);
-			if (!wheelRes.ok) {
-				console.error(`  Failed to download ${wheel.filename}: ${wheelRes.status}`);
+			const wheelUrlCandidates = [];
+			if (useNexus && metadataSource?.includes('/pypi-proxy/')) {
+				wheelUrlCandidates.push(wheel.url);
+			}
+			wheelUrlCandidates.push(wheel.url.replace(/https:\/\/files\.pythonhosted\.org\//, `${nexusBaseUrl.replace(/\/$/, '')}/pypi-proxy/`));
+			wheelUrlCandidates.push(wheel.url.replace(/https:\/\/files\.pythonhosted\.org\//, 'https://files.pythonhosted.org/'));
+
+			let wheelRes = null;
+			for (const url of wheelUrlCandidates) {
+				const attempt = await fetch(url);
+				if (attempt.ok) {
+					wheelRes = attempt;
+					break;
+				}
+			}
+
+			if (!wheelRes) {
+				console.error(`  Failed to download ${wheel.filename}`);
 				continue;
 			}
 			const buffer = Buffer.from(await wheelRes.arrayBuffer());
